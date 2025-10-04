@@ -6,6 +6,14 @@ import { ConfigService } from '@nestjs/config';
 import { Response, ResponseDocument } from './schemas/response.schema';
 import { firstValueFrom } from 'rxjs';
 
+export interface ResponseStats {
+  total: number;
+  successful: number;
+  failed: number;
+  successRate: number;
+  averageResponseTime: number;
+}
+
 @Injectable()
 export class ResponseService {
   private readonly logger = new Logger(ResponseService.name);
@@ -134,7 +142,7 @@ export class ResponseService {
   /**
    * Get response statistics
    */
-  async getResponseStats(): Promise<any> {
+  async getResponseStats(): Promise<ResponseStats> {
     const total = await this.responseModel.countDocuments();
     const successful = await this.responseModel.countDocuments({
       statusCode: { $gte: 200, $lt: 400 },

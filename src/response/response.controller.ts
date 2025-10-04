@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Logger } from '@nestjs/common';
-import { ResponseService } from './response.service';
+import { ResponseService, ResponseStats } from './response.service';
 
 @Controller('responses')
 export class ResponseController {
@@ -44,10 +44,13 @@ export class ResponseController {
    * GET /responses/stats
    */
   @Get('stats')
-  async getResponseStats() {
+  async getResponseStats(): Promise<{
+    success: boolean;
+    data: ResponseStats;
+  }> {
     this.logger.log('Fetching response statistics');
 
-    const stats = await this.responseService.getResponseStats();
+    const stats: ResponseStats = await this.responseService.getResponseStats();
 
     return {
       success: true,

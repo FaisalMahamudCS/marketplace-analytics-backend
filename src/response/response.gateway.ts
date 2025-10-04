@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import { ResponseService } from './response.service';
+import { ResponseService, ResponseStats } from './response.service';
 
 @WebSocketGateway({
   cors: {
@@ -102,7 +102,7 @@ export class ResponseGateway
   @SubscribeMessage('getStats')
   async handleGetStats(client: Socket): Promise<void> {
     try {
-      const stats = await this.responseService.getResponseStats();
+      const stats: ResponseStats = await this.responseService.getResponseStats();
 
       client.emit('statsResponse', {
         success: true,

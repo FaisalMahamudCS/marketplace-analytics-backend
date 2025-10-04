@@ -5,44 +5,44 @@ import { ResponseGateway } from './response.gateway';
 
 @Injectable()
 export class SchedulerService {
-    private readonly logger = new Logger(SchedulerService.name);
+  private readonly logger = new Logger(SchedulerService.name);
 
-    constructor(
-        private readonly responseService: ResponseService,
-        private readonly responseGateway: ResponseGateway,
-    ) { }
+  constructor(
+    private readonly responseService: ResponseService,
+    private readonly responseGateway: ResponseGateway,
+  ) {}
 
-    /**
-     * Ping httpbin.org/anything every 5 minutes
-     * Cron expression: every 5 minutes
-     */
-    @Cron('0 */5 * * * *')
-    async handlePingHttpBin() {
-        this.logger.log('Starting scheduled ping to httpbin.org/anything');
+  /**
+   * Ping httpbin.org/anything every 5 minutes
+   * Cron expression: every 5 minutes
+   */
+  @Cron('0 */5 * * * *')
+  async handlePingHttpBin() {
+    this.logger.log('Starting scheduled ping to httpbin.org/anything');
 
-        try {
-            await this.responseService.pingHttpBin();
+    try {
+      await this.responseService.pingHttpBin();
 
-            // Get the latest response and broadcast it
-            const latestResponse = await this.responseService.getLatestResponse();
-            if (latestResponse) {
-                await this.responseGateway.broadcastNewResponse(
-                    latestResponse.toObject() as Record<string, unknown>,
-                );
-                await this.responseGateway.broadcastUpdatedStats();
-            }
+      // Get the latest response and broadcast it
+      const latestResponse = await this.responseService.getLatestResponse();
+      if (latestResponse) {
+        await this.responseGateway.broadcastNewResponse(
+          latestResponse.toObject() as Record<string, unknown>,
+        );
+        await this.responseGateway.broadcastUpdatedStats();
+      }
 
-            this.logger.log('Successfully completed scheduled ping and broadcast');
-        } catch (error) {
-            this.logger.error('Error in scheduled ping:', error);
-        }
+      this.logger.log('Successfully completed scheduled ping and broadcast');
+    } catch (error) {
+      this.logger.error('Error in scheduled ping:', error);
     }
+  }
 
-    /**
-     * Optional: Ping immediately on startup for testing
-     */
-    async pingOnStartup() {
-        this.logger.log('Performing initial ping on startup...');
-        await this.handlePingHttpBin();
-    }
+  /**
+   * Optional: Ping immediately on startup for testing
+   */
+  async pingOnStartup() {
+    this.logger.log('Performing initial ping on startup...');
+    await this.handlePingHttpBin();
+  }
 }
