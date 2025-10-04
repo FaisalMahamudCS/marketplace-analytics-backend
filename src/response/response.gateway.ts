@@ -11,7 +11,7 @@ import { ResponseService, ResponseStats } from './response.service';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: 'http://localhost:3002',
   },
 })
 export class ResponseGateway
@@ -43,7 +43,7 @@ export class ResponseGateway
       if (latestResponse) {
         client.emit('latestResponse', {
           success: true,
-          data: latestResponse,
+          data: latestResponse.marketplaceData,
         });
       }
     } catch (error) {
@@ -55,16 +55,19 @@ export class ResponseGateway
   }
 
   /**
-   * Broadcast new response data to all connected clients
+   * Broadcast new marketplace data to all connected clients
    */
   async broadcastNewResponse(
     responseData: Record<string, unknown>,
   ): Promise<void> {
-    this.logger.log('Broadcasting new response data to all clients');
+    this.logger.log('Broadcasting new marketplace data to all clients');
+
+    // Extract marketplace data from the response
+    const marketplaceData = (responseData as any).marketplaceData;
 
     this.server.emit('newResponse', {
       success: true,
-      data: responseData,
+      data: marketplaceData,
       timestamp: new Date().toISOString(),
     });
   }

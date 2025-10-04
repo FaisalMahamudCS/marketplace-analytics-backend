@@ -30,7 +30,7 @@ export class ResponseController {
 
     return {
       success: true,
-      data: responses,
+      data: responses.map(response => (response as any).marketplaceData),
       pagination: {
         limit: limitNum,
         offset: offsetNum,
@@ -64,13 +64,13 @@ export class ResponseController {
    */
   @Get('latest')
   async getLatestResponse() {
-    this.logger.log('Fetching latest response');
+    this.logger.log('Fetching latest marketplace data');
 
     const latestResponse = await this.responseService.getLatestResponse();
 
     return {
       success: true,
-      data: latestResponse,
+      data: latestResponse ? (latestResponse as any).marketplaceData : null,
     };
   }
 }

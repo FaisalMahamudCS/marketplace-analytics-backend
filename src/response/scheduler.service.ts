@@ -16,7 +16,7 @@ export class SchedulerService {
    * Ping httpbin.org/anything every 5 minutes
    * Cron expression: every 5 minutes
    */
-  @Cron('0 */5 * * * *')
+  @Cron('0 */1 * * * *')
   async handlePingHttpBin() {
     this.logger.log('Starting scheduled ping to httpbin.org/anything');
 
