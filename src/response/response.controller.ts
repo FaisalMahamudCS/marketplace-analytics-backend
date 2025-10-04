@@ -5,7 +5,7 @@ import { ResponseService, ResponseStats } from './response.service';
 export class ResponseController {
   private readonly logger = new Logger(ResponseController.name);
 
-  constructor(private readonly responseService: ResponseService) {}
+  constructor(private readonly responseService: ResponseService) { }
 
   /**
    * Get all historical response data

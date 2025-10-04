@@ -22,7 +22,7 @@ export class ResponseService {
     @InjectModel(Response.name) private responseModel: Model<ResponseDocument>,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   /**
    * Generate random JSON payload for testing

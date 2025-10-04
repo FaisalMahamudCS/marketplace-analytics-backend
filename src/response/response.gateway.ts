@@ -15,14 +15,13 @@ import { ResponseService, ResponseStats } from './response.service';
   },
 })
 export class ResponseGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
   private readonly logger = new Logger(ResponseGateway.name);
 
-  constructor(private readonly responseService: ResponseService) {}
+  constructor(private readonly responseService: ResponseService) { }
 
   handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
