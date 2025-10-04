@@ -13,7 +13,7 @@ import { ResponseModule } from './response/response.module';
     // Use env variable for MongoDB connection
     MongooseModule.forRoot(
       process.env.MONGO_URI ||
-      'mongodb://localhost:27017/marketplace-analytics',
+        'mongodb://localhost:27017/marketplace-analytics',
     ),
 
     ScheduleModule.forRoot(),
@@ -21,4 +21,4 @@ import { ResponseModule } from './response/response.module';
     ResponseModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

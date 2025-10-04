@@ -8,14 +8,14 @@ import { ResponseGateway } from './response.gateway';
 import { SchedulerService } from './scheduler.service';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([
-            { name: Response.name, schema: ResponseSchema },
-        ]),
-        HttpModule,
-    ],
-    controllers: [ResponseController],
-    providers: [ResponseService, ResponseGateway, SchedulerService],
-    exports: [ResponseService, ResponseGateway],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Response.name, schema: ResponseSchema },
+    ]),
+    HttpModule,
+  ],
+  controllers: [ResponseController],
+  providers: [ResponseService, ResponseGateway, SchedulerService],
+  exports: [ResponseService, ResponseGateway],
 })
-export class ResponseModule { }
+export class ResponseModule {}
