@@ -26,8 +26,8 @@ export class SchedulerService {
       // Get the latest response and broadcast it
       const latestResponse = await this.responseService.getLatestResponse();
       if (latestResponse) {
-        await this.responseGateway.broadcastNewResponse(
-          latestResponse.toObject() as Record<string, unknown>,
+        this.responseGateway.broadcastNewResponse(
+          latestResponse as unknown as Record<string, unknown>,
         );
         await this.responseGateway.broadcastUpdatedStats();
       }

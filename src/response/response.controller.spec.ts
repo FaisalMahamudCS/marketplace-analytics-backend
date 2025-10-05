@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseController } from './response.controller';
 import { ResponseService } from './response.service';
-import { ResponseDocument } from './schemas/response.schema';
+import { MarketplaceResponseWithData } from './dao/interfaces/response.dao.interface';
 
 describe('ResponseController', () => {
   let controller: ResponseController;
@@ -37,9 +37,9 @@ describe('ResponseController', () => {
   describe('getAllResponses', () => {
     it('should return paginated responses with default values', async () => {
       const mockResponses = [
-        { _id: '1', statusCode: 200, timestamp: new Date() },
-        { _id: '2', statusCode: 200, timestamp: new Date() },
-      ] as ResponseDocument[];
+        { marketplaceData: { activeDeals: 1 } },
+        { marketplaceData: { activeDeals: 2 } },
+      ] as unknown as MarketplaceResponseWithData[];
 
       mockResponseService.getAllResponses.mockResolvedValue(mockResponses);
 
@@ -47,7 +47,7 @@ describe('ResponseController', () => {
 
       expect(result).toEqual({
         success: true,
-        data: mockResponses,
+        data: [{ activeDeals: 1 }, { activeDeals: 2 }],
         pagination: {
           limit: 100,
           offset: 0,
@@ -59,8 +59,8 @@ describe('ResponseController', () => {
 
     it('should return paginated responses with custom values', async () => {
       const mockResponses = [
-        { _id: '1', statusCode: 200, timestamp: new Date() },
-      ] as ResponseDocument[];
+        { marketplaceData: { averageDealValueUSD: 10000 } },
+      ] as unknown as MarketplaceResponseWithData[];
 
       mockResponseService.getAllResponses.mockResolvedValue(mockResponses);
 
@@ -68,7 +68,7 @@ describe('ResponseController', () => {
 
       expect(result).toEqual({
         success: true,
-        data: mockResponses,
+        data: [{ averageDealValueUSD: 10000 }],
         pagination: {
           limit: 50,
           offset: 10,
@@ -79,7 +79,7 @@ describe('ResponseController', () => {
     });
 
     it('should handle invalid query parameters', async () => {
-      const mockResponses = [] as ResponseDocument[];
+      const mockResponses = [] as unknown as MarketplaceResponseWithData[];
 
       mockResponseService.getAllResponses.mockResolvedValue(mockResponses);
 
@@ -113,12 +113,10 @@ describe('ResponseController', () => {
   });
 
   describe('getLatestResponse', () => {
-    it('should return latest response', async () => {
+    it('should return latest response marketplaceData', async () => {
       const mockResponse = {
-        _id: '123',
-        statusCode: 200,
-        timestamp: new Date(),
-      } as ResponseDocument;
+        marketplaceData: { offersSubmitted: 5 },
+      } as { marketplaceData: { offersSubmitted: number } };
 
       mockResponseService.getLatestResponse.mockResolvedValue(mockResponse);
 
@@ -126,7 +124,7 @@ describe('ResponseController', () => {
 
       expect(result).toEqual({
         success: true,
-        data: mockResponse,
+        data: { offersSubmitted: 5 },
       });
       expect(mockResponseService.getLatestResponse).toHaveBeenCalled();
     });

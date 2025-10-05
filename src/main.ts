@@ -6,7 +6,12 @@ async function bootstrap() {
 
   // Enable CORS for frontend communication
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://localhost:3000','http://localhost:3002','https://marketplace-analytics-dashboard-fro.vercel.app'],
+    origin: [
+      'http://localhost:3001',
+      'http://localhost:3000',
+      'http://localhost:3002',
+      'https://marketplace-analytics-dashboard-fro.vercel.app',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   });

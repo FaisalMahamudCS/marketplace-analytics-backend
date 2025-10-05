@@ -12,4 +12,4 @@ import { ResponseDAOModule } from './dao/response.dao.module';
   providers: [ResponseService, ResponseGateway, SchedulerService],
   exports: [ResponseService, ResponseGateway],
 })
-export class ResponseModule { }
+export class ResponseModule {}

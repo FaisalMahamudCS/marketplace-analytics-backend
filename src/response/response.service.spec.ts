@@ -1,23 +1,30 @@
+/*
+eslint-disable @typescript-eslint/no-unsafe-assignment,
+               @typescript-eslint/no-unsafe-member-access,
+               @typescript-eslint/no-unsafe-argument,
+               @typescript-eslint/unbound-method
+*/
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseService } from './response.service';
-import { getModelToken } from '@nestjs/mongoose';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { Model } from 'mongoose';
-import { Response, ResponseDocument } from './schemas/response.schema';
+import { MarketplaceResponseDAO } from './dao/response.dao';
 import { of, throwError } from 'rxjs';
+import { ResponseStats } from './dao/interfaces/response.dao.interface';
 
 describe('ResponseService', () => {
   let service: ResponseService;
 
-  const mockResponseModel = {
-    new: jest.fn(),
-    save: jest.fn(),
-    find: jest.fn(),
+  const mockMarketplaceResponseDAO: jest.Mocked<MarketplaceResponseDAO> = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findLatest: jest.fn(),
+    getStats: jest.fn(),
     countDocuments: jest.fn(),
-    aggregate: jest.fn(),
-    findOne: jest.fn(),
-  };
+    countSuccessful: jest.fn(),
+    countFailed: jest.fn(),
+    getAverageResponseTime: jest.fn(),
+  } as any;
 
   const mockHttpService = {
     post: jest.fn(),
@@ -32,8 +39,8 @@ describe('ResponseService', () => {
       providers: [
         ResponseService,
         {
-          provide: getModelToken(Response.name),
-          useValue: mockResponseModel,
+          provide: MarketplaceResponseDAO,
+          useValue: mockMarketplaceResponseDAO,
         },
         {
           provide: HttpService,
@@ -57,30 +64,43 @@ describe('ResponseService', () => {
     expect(service).toBeDefined();
   });
 
+  describe('generateMarketplacePayload', () => {
+    it('should generate payload with valid ranges', () => {
+      const payload = (
+        service as unknown as { generateMarketplacePayload: () => any }
+      ).generateMarketplacePayload();
+      expect(typeof payload.timestamp).toBe('number');
+      expect(payload.activeDeals).toBeGreaterThanOrEqual(50);
+      expect(payload.activeDeals).toBeLessThanOrEqual(250);
+      expect(payload.newDeals).toBeGreaterThanOrEqual(0);
+      expect(payload.newDeals).toBeLessThanOrEqual(9);
+      expect(payload.averageDealValueUSD).toBeGreaterThanOrEqual(5000);
+      expect(payload.averageDealValueUSD).toBeLessThanOrEqual(55000);
+      expect(payload.offersSubmitted).toBeGreaterThanOrEqual(0);
+      expect(payload.offersSubmitted).toBeLessThanOrEqual(29);
+      expect(payload.userViews).toBeGreaterThanOrEqual(0);
+      expect(payload.userViews).toBeLessThanOrEqual(499);
+    });
+  });
+
   describe('pingHttpBin', () => {
-    it('should successfully ping httpbin.org and save response', async () => {
-      const mockResponse = {
-        status: 200,
-        data: { message: 'success' },
-      };
-
-      const mockSavedResponse = {
-        _id: '123',
-        url: 'https://httpbin.org/anything',
-        method: 'POST',
-        statusCode: 200,
-        responseTime: 100,
-        timestamp: new Date(),
-      };
-
+    it('should POST to httpbin and persist marketplace response', async () => {
+      const mockResponse = { status: 200, data: { ok: true } };
       mockHttpService.post.mockReturnValue(of(mockResponse));
-      mockResponseModel.save.mockResolvedValue(mockSavedResponse);
+      mockMarketplaceResponseDAO.create.mockResolvedValue({} as any);
 
       await service.pingHttpBin();
 
       expect(mockHttpService.post).toHaveBeenCalledWith(
         'https://httpbin.org/anything',
-        expect.any(Object),
+        expect.objectContaining({
+          timestamp: expect.any(Number),
+          activeDeals: expect.any(Number),
+          newDeals: expect.any(Number),
+          averageDealValueUSD: expect.any(Number),
+          offersSubmitted: expect.any(Number),
+          userViews: expect.any(Number),
+        }),
         expect.objectContaining({
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
@@ -89,44 +109,53 @@ describe('ResponseService', () => {
           timeout: 10000,
         }),
       );
-      expect(mockResponseModel.save).toHaveBeenCalled();
+
+      expect(mockMarketplaceResponseDAO.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: 'https://httpbin.org/anything',
+          method: 'POST',
+          marketplaceData: expect.any(Object),
+          statusCode: 200,
+          responseData: expect.objectContaining({
+            success: true,
+            httpbinResponse: { ok: true },
+          }),
+          responseTime: expect.any(Number),
+          timestamp: expect.any(Date),
+        }),
+      );
     });
 
-    it('should handle HTTP errors gracefully', async () => {
-      const mockError = {
-        response: {
-          status: 500,
-          data: { error: 'Internal Server Error' },
-        },
+    it('should persist error shape on HTTP error with response', async () => {
+      const httpError = {
+        response: { status: 500, data: { error: 'Internal' } },
         message: 'Request failed',
-      } as any;
-
-      mockHttpService.post.mockReturnValue(throwError(() => mockError));
-      mockResponseModel.save.mockResolvedValue({});
+      };
+      mockHttpService.post.mockReturnValue(throwError(() => httpError));
+      mockMarketplaceResponseDAO.create.mockResolvedValue({} as any);
 
       await service.pingHttpBin();
 
-      expect(mockResponseModel.save).toHaveBeenCalledWith(
+      expect(mockMarketplaceResponseDAO.create).toHaveBeenCalledWith(
         expect.objectContaining({
           statusCode: 500,
+          responseData: { error: 'Internal' },
           error: 'Request failed',
         }),
       );
     });
 
-    it('should handle network errors', async () => {
-      const mockError = {
-        message: 'Network Error',
-      };
-
-      mockHttpService.post.mockReturnValue(throwError(() => mockError));
-      mockResponseModel.save.mockResolvedValue({});
+    it('should persist error shape on network error (no response)', async () => {
+      const httpError = { message: 'Network Error' };
+      mockHttpService.post.mockReturnValue(throwError(() => httpError));
+      mockMarketplaceResponseDAO.create.mockResolvedValue({} as any);
 
       await service.pingHttpBin();
 
-      expect(mockResponseModel.save).toHaveBeenCalledWith(
+      expect(mockMarketplaceResponseDAO.create).toHaveBeenCalledWith(
         expect.objectContaining({
           statusCode: 0,
+          responseData: null,
           error: 'Network Error',
         }),
       );
@@ -134,115 +163,48 @@ describe('ResponseService', () => {
   });
 
   describe('getAllResponses', () => {
-    it('should return paginated responses', async () => {
-      const mockResponses = [
-        { _id: '1', statusCode: 200, timestamp: new Date() },
-        { _id: '2', statusCode: 200, timestamp: new Date() },
-      ];
-
-      const mockQuery = {
-        sort: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue(mockResponses),
-      };
-
-      mockResponseModel.find.mockReturnValue(mockQuery);
-
-      const result = await service.getAllResponses(10, 5);
-
-      expect(result).toEqual(mockResponses);
-      expect(mockResponseModel.find).toHaveBeenCalled();
-      expect(mockQuery.sort).toHaveBeenCalledWith({ timestamp: -1 });
-      expect(mockQuery.limit).toHaveBeenCalledWith(10);
-      expect(mockQuery.skip).toHaveBeenCalledWith(5);
+    it('should return DAO results and use defaults', async () => {
+      mockMarketplaceResponseDAO.findAll.mockResolvedValue([] as any);
+      await service.getAllResponses();
+      expect(mockMarketplaceResponseDAO.findAll).toHaveBeenCalledWith(100, 0);
     });
 
-    it('should use default pagination values', async () => {
-      const mockQuery = {
-        sort: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([]),
-      };
-
-      mockResponseModel.find.mockReturnValue(mockQuery);
-
-      await service.getAllResponses();
-
-      expect(mockQuery.limit).toHaveBeenCalledWith(100);
-      expect(mockQuery.skip).toHaveBeenCalledWith(0);
+    it('should forward pagination params', async () => {
+      mockMarketplaceResponseDAO.findAll.mockResolvedValue([{}] as any);
+      const res = await service.getAllResponses(10, 5);
+      expect(res).toEqual([{}]);
+      expect(mockMarketplaceResponseDAO.findAll).toHaveBeenCalledWith(10, 5);
     });
   });
 
   describe('getResponseStats', () => {
-    it('should return correct statistics', async () => {
-      mockResponseModel.countDocuments
-        .mockResolvedValueOnce(100) // total
-        .mockResolvedValueOnce(80) // successful
-        .mockResolvedValueOnce(20); // failed
-
-      mockResponseModel.aggregate.mockResolvedValue([{ avgTime: 150.5 }]);
-
-      const result = await service.getResponseStats();
-
-      expect(result).toEqual({
+    it('should return DAO stats', async () => {
+      const stats: ResponseStats = {
         total: 100,
         successful: 80,
         failed: 20,
         successRate: 80,
-        averageResponseTime: 150.5,
-      });
-    });
-
-    it('should handle zero total responses', async () => {
-      mockResponseModel.countDocuments
-        .mockResolvedValueOnce(0) // total
-        .mockResolvedValueOnce(0) // successful
-        .mockResolvedValueOnce(0); // failed
-
-      mockResponseModel.aggregate.mockResolvedValue([]);
-
-      const result = await service.getResponseStats();
-
-      expect(result.successRate).toBe(0);
-      expect(result.averageResponseTime).toBe(0);
+        averageResponseTime: 120,
+      };
+      mockMarketplaceResponseDAO.getStats.mockResolvedValue(stats);
+      const res = await service.getResponseStats();
+      expect(res).toEqual(stats);
     });
   });
 
   describe('getLatestResponse', () => {
-    it('should return the latest response', async () => {
-      const mockResponse = {
-        _id: '123',
-        statusCode: 200,
-        timestamp: new Date(),
-      };
-
-      const mockQuery = {
-        sort: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue(mockResponse),
-      };
-
-      mockResponseModel.findOne.mockReturnValue(mockQuery);
-
-      const result = await service.getLatestResponse();
-
-      expect(result).toEqual(mockResponse);
-      expect(mockResponseModel.findOne).toHaveBeenCalled();
-      expect(mockQuery.sort).toHaveBeenCalledWith({ timestamp: -1 });
+    it('should return latest from DAO', async () => {
+      mockMarketplaceResponseDAO.findLatest.mockResolvedValue({
+        _id: 'x',
+      } as any);
+      const res = await service.getLatestResponse();
+      expect(res).toEqual({ _id: 'x' });
     });
 
-    it('should return null when no responses exist', async () => {
-      const mockQuery = {
-        sort: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue(null),
-      };
-
-      mockResponseModel.findOne.mockReturnValue(mockQuery);
-
-      const result = await service.getLatestResponse();
-
-      expect(result).toBeNull();
+    it('should return null if none', async () => {
+      mockMarketplaceResponseDAO.findLatest.mockResolvedValue(null);
+      const res = await service.getLatestResponse();
+      expect(res).toBeNull();
     });
   });
 });

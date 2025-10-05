@@ -6,7 +6,7 @@ import { ResponseStats } from './dao/interfaces/response.dao.interface';
 export class ResponseController {
   private readonly logger = new Logger(ResponseController.name);
 
-  constructor(private readonly responseService: ResponseService) { }
+  constructor(private readonly responseService: ResponseService) {}
 
   /**
    * Get all historical response data
@@ -31,7 +31,7 @@ export class ResponseController {
 
     return {
       success: true,
-      data: responses.map(response => (response as any).marketplaceData),
+      data: responses.map((response) => response.marketplaceData),
       pagination: {
         limit: limitNum,
         offset: offsetNum,
@@ -71,7 +71,7 @@ export class ResponseController {
 
     return {
       success: true,
-      data: latestResponse ? (latestResponse as any).marketplaceData : null,
+      data: latestResponse ? latestResponse.marketplaceData : null,
     };
   }
 }
