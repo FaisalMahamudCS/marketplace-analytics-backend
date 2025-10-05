@@ -12,7 +12,7 @@ import { ResponseStats } from './dao/interfaces/response.dao.interface';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3002',
+    origin: ['http://localhost:3002','https://marketplace-analytics-dashboard-fro.vercel.app']
   },
 })
 export class ResponseGateway
