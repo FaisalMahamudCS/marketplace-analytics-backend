@@ -1,33 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import {
-  Response,
-  ResponseDocument,
-  MarketplaceResponse,
-  MarketplaceResponseDocument,
-  MarketplaceData,
-} from './schemas/response.schema';
+import { MarketplaceData } from './schemas/response.schema';
 import { firstValueFrom } from 'rxjs';
-
-export interface ResponseStats {
-  total: number;
-  successful: number;
-  failed: number;
-  successRate: number;
-  averageResponseTime: number;
-}
+import { MarketplaceResponseDAO } from './dao/response.dao';
+import { ResponseStats } from './dao/interfaces/response.dao.interface';
 
 @Injectable()
 export class ResponseService {
   private readonly logger = new Logger(ResponseService.name);
 
   constructor(
-    @InjectModel(Response.name) private responseModel: Model<ResponseDocument>,
-    @InjectModel(MarketplaceResponse.name)
-    private marketplaceResponseModel: Model<MarketplaceResponseDocument>,
+    private readonly marketplaceResponseDAO: MarketplaceResponseDAO,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) { }
@@ -88,7 +72,7 @@ export class ResponseService {
         timestamp: new Date(),
       };
 
-      await this.saveMarketplaceResponse(marketplaceResponseData);
+      await this.marketplaceResponseDAO.create(marketplaceResponseData);
       this.logger.log(
         `Successfully pinged httpbin.org - Status: ${response.status}, Response Time: ${responseTime}ms`,
       );
@@ -106,32 +90,13 @@ export class ResponseService {
         error: (error as Error).message,
       };
 
-      await this.saveMarketplaceResponse(errorData);
+      await this.marketplaceResponseDAO.create(errorData);
       this.logger.error(
         `Failed to ping httpbin.org: ${(error as Error).message}`,
       );
     }
   }
 
-  /**
-   * Save response data to database
-   */
-  private async saveResponse(
-    responseData: Record<string, unknown>,
-  ): Promise<ResponseDocument> {
-    const response = new this.responseModel(responseData);
-    return await response.save();
-  }
-
-  /**
-   * Save marketplace response data to database
-   */
-  private async saveMarketplaceResponse(
-    responseData: Record<string, unknown>,
-  ): Promise<MarketplaceResponseDocument> {
-    const response = new this.marketplaceResponseModel(responseData);
-    return await response.save();
-  }
 
   /**
    * Get all historical marketplace response data
@@ -139,47 +104,21 @@ export class ResponseService {
   async getAllResponses(
     limit: number = 100,
     offset: number = 0,
-  ): Promise<MarketplaceResponseDocument[]> {
-    return await this.marketplaceResponseModel
-      .find()
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .skip(offset)
-      .exec();
+  ) {
+    return await this.marketplaceResponseDAO.findAll(limit, offset);
   }
 
   /**
    * Get marketplace response statistics
    */
   async getResponseStats(): Promise<ResponseStats> {
-    const total = await this.marketplaceResponseModel.countDocuments();
-    const successful = await this.marketplaceResponseModel.countDocuments({
-      statusCode: { $gte: 200, $lt: 400 },
-    });
-    const failed = await this.marketplaceResponseModel.countDocuments({
-      statusCode: { $gte: 400 },
-    });
-
-    const avgResponseTime = await this.marketplaceResponseModel.aggregate([
-      { $group: { _id: null, avgTime: { $avg: '$responseTime' } } },
-    ]);
-
-    return {
-      total,
-      successful,
-      failed,
-      successRate: total > 0 ? (successful / total) * 100 : 0,
-      averageResponseTime: (avgResponseTime[0] as any)?.avgTime || 0,
-    };
+    return await this.marketplaceResponseDAO.getStats();
   }
 
   /**
    * Get latest marketplace response for real-time updates
    */
-  async getLatestResponse(): Promise<MarketplaceResponseDocument | null> {
-    return await this.marketplaceResponseModel
-      .findOne()
-      .sort({ timestamp: -1 })
-      .exec();
+  async getLatestResponse() {
+    return await this.marketplaceResponseDAO.findLatest();
   }
 }

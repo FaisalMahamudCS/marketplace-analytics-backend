@@ -1,5 +1,6 @@
 import { Controller, Get, Query, Logger } from '@nestjs/common';
-import { ResponseService, ResponseStats } from './response.service';
+import { ResponseService } from './response.service';
+import { ResponseStats } from './dao/interfaces/response.dao.interface';
 
 @Controller('responses')
 export class ResponseController {

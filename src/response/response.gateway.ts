@@ -7,7 +7,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import { ResponseService, ResponseStats } from './response.service';
+import { ResponseService } from './response.service';
+import { ResponseStats } from './dao/interfaces/response.dao.interface';
 
 @WebSocketGateway({
   cors: {
