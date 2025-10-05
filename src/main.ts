@@ -14,7 +14,7 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
 
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`📊 HTTP Response Monitor Backend started successfully!`);
+  console.log(` Application is running on:${port}`);
+  console.log(` HTTP Response Monitor Backend started successfully!`);
 }
 void bootstrap();
