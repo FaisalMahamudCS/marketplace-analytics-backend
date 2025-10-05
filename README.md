@@ -171,29 +171,32 @@ The application will be available at:
 
 ##  Testing Strategy
 
-### Core Components Identified
+### Core Parts of the Application (and why they matter)
 
-1. **ResponseService** - Core business logic for HTTP monitoring
-2. **ResponseController** - API endpoint handling
-3. **ResponseGateway** - WebSocket real-time communication
-4. **SchedulerService** - Automated task scheduling
+- **ResponseService (Primary core, comprehensively tested)**: Orchestrates the external HTTP call, generates marketplace payloads with invariants, persists via DAO, and exposes read methods. This is the business logic linchpin and failure boundary.
+- **MarketplaceResponseDAO**: Encapsulates data access and stats aggregation. Keeps persistence concerns isolated and testable.
+- **SchedulerService**: Periodically triggers monitoring and broadcasts fresh data. Ensures real-time flow.
+- **ResponseGateway**: Pushes new data and stats to clients in real-time.
+- **ResponseController**: Exposes REST endpoints for history and stats.
 
-### Testing Approach
+### What we tested comprehensively (ONE core component)
 
-**Unit Tests:**
-- Service layer business logic
-- Controller endpoint handling
-- Utility functions and data transformations
+We chose to write comprehensive tests for **ResponseService** as the single, deeply tested core component:
 
-**Integration Tests:**
-- API endpoint integration
-- Database operations
-- WebSocket communication
+- Payload generation ranges and structure
+- Successful httpbin POST with correct headers/timeout and persisted shape
+- Error handling for HTTP errors (with response) and network errors (no response)
+- Pagination defaults and parameter forwarding
+- Stats passthrough via DAO
+- Latest response passthrough via DAO
 
-**E2E Tests:**
-- Complete user workflows
-- Frontend-backend integration
-- Real-time data flow
+Additional targeted unit tests were added for DAO, Scheduler, and Gateway to ensure end-to-end reliability.
+
+### Probable Test Categories Covered
+
+- **Unit tests (critical business logic):** ResponseService (comprehensive), DAO, SchedulerService, ResponseGateway
+- **Integration tests (key API endpoints):** Recommended next (using mongodb-memory-server); structure supports easy addition
+- **Basic end-to-end tests (critical flows):** Out of scope for the timebox but straightforward to add later
 
 ### Running Tests
 

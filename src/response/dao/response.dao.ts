@@ -19,13 +19,13 @@ export class MarketplaceResponseDAO implements IMarketplaceResponseDAO {
   constructor(
     @InjectModel(MarketplaceResponse.name)
     private readonly marketplaceResponseModel: Model<MarketplaceResponseDocument>,
-  ) {}
+  ) { }
 
   async create(
     responseData: Record<string, unknown>,
   ): Promise<MarketplaceResponseDocument> {
-    const response = new this.marketplaceResponseModel(responseData);
-    return await response.save();
+    // Use model.create for simpler construction/mocking
+    return await this.marketplaceResponseModel.create(responseData as any);
   }
 
   async findAll(
@@ -93,7 +93,7 @@ export class GenericResponseDAO implements IGenericResponseDAO {
   constructor(
     @InjectModel(Response.name)
     private readonly responseModel: Model<ResponseDocument>,
-  ) {}
+  ) { }
 
   async create(
     responseData: Record<string, unknown>,
