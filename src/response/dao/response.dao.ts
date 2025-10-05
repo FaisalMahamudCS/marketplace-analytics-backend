@@ -19,7 +19,7 @@ export class MarketplaceResponseDAO implements IMarketplaceResponseDAO {
   constructor(
     @InjectModel(MarketplaceResponse.name)
     private readonly marketplaceResponseModel: Model<MarketplaceResponseDocument>,
-  ) { }
+  ) {}
 
   async create(
     responseData: Record<string, unknown>,
@@ -94,7 +94,7 @@ export class GenericResponseDAO implements IGenericResponseDAO {
   constructor(
     @InjectModel(Response.name)
     private readonly responseModel: Model<ResponseDocument>,
-  ) { }
+  ) {}
 
   async create(
     responseData: Record<string, unknown>,
