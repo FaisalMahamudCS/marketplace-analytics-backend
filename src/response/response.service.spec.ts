@@ -1,3 +1,9 @@
+/*
+eslint-disable @typescript-eslint/no-unsafe-assignment,
+               @typescript-eslint/no-unsafe-member-access,
+               @typescript-eslint/no-unsafe-argument,
+               @typescript-eslint/unbound-method
+*/
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseService } from './response.service';
 import { HttpService } from '@nestjs/axios';
@@ -60,7 +66,9 @@ describe('ResponseService', () => {
 
   describe('generateMarketplacePayload', () => {
     it('should generate payload with valid ranges', () => {
-      const payload = (service as any).generateMarketplacePayload();
+      const payload = (
+        service as unknown as { generateMarketplacePayload: () => any }
+      ).generateMarketplacePayload();
       expect(typeof payload.timestamp).toBe('number');
       expect(payload.activeDeals).toBeGreaterThanOrEqual(50);
       expect(payload.activeDeals).toBeLessThanOrEqual(250);
@@ -186,7 +194,9 @@ describe('ResponseService', () => {
 
   describe('getLatestResponse', () => {
     it('should return latest from DAO', async () => {
-      mockMarketplaceResponseDAO.findLatest.mockResolvedValue({ _id: 'x' } as any);
+      mockMarketplaceResponseDAO.findLatest.mockResolvedValue({
+        _id: 'x',
+      } as any);
       const res = await service.getLatestResponse();
       expect(res).toEqual({ _id: 'x' });
     });

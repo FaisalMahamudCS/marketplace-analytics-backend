@@ -35,8 +35,13 @@ export interface IMarketplaceResponseDAO {
 }
 
 export interface IGenericResponseDAO {
-    create(responseData: Record<string, unknown>): Promise<any>;
-    findAll(limit: number, offset: number): Promise<any[]>;
-    findLatest(): Promise<any | null>;
+    create(
+        responseData: Record<string, unknown>,
+    ): Promise<MarketplaceResponseDocument>;
+    findAll(
+        limit: number,
+        offset: number,
+    ): Promise<MarketplaceResponseDocument[]>;
+    findLatest(): Promise<MarketplaceResponseDocument | null>;
     getStats(): Promise<ResponseStats>;
 }

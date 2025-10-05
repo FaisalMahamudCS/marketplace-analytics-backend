@@ -10,7 +10,7 @@ export class SchedulerService {
   constructor(
     private readonly responseService: ResponseService,
     private readonly responseGateway: ResponseGateway,
-  ) { }
+  ) {}
 
   /**
    * Ping httpbin.org/anything every 5 minutes
@@ -26,8 +26,8 @@ export class SchedulerService {
       // Get the latest response and broadcast it
       const latestResponse = await this.responseService.getLatestResponse();
       if (latestResponse) {
-        await this.responseGateway.broadcastNewResponse(
-          (latestResponse as unknown) as Record<string, unknown>,
+        this.responseGateway.broadcastNewResponse(
+          latestResponse as unknown as Record<string, unknown>,
         );
         await this.responseGateway.broadcastUpdatedStats();
       }

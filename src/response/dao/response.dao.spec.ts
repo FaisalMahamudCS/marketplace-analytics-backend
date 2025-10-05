@@ -13,7 +13,13 @@ describe('MarketplaceResponseDAO', () => {
     exec: jest.fn(),
   };
 
-  const injectedModelMock: any = {
+  const injectedModelMock: {
+    create: jest.Mock;
+    find: jest.Mock;
+    findOne: jest.Mock;
+    countDocuments: jest.Mock;
+    aggregate: jest.Mock;
+  } = {
     create: jest.fn(),
     find: jest.fn().mockReturnValue(mockQuery),
     findOne: jest.fn().mockReturnValue(mockQuery),
@@ -34,12 +40,14 @@ describe('MarketplaceResponseDAO', () => {
 
     dao = module.get<MarketplaceResponseDAO>(MarketplaceResponseDAO);
     // make sure the dao uses our mock reference
-    (dao as any).marketplaceResponseModel = injectedModelMock;
+    (
+      dao as unknown as { marketplaceResponseModel: typeof injectedModelMock }
+    ).marketplaceResponseModel = injectedModelMock;
     jest.clearAllMocks();
   });
 
   it('create: should save document', async () => {
-    const data = { url: 'u', method: 'POST' } as any;
+    const data = { url: 'u', method: 'POST' } as Record<string, unknown>;
     injectedModelMock.create.mockResolvedValue({ _id: '1', ...data });
     const res = await dao.create(data);
     expect(res).toEqual({ _id: '1', ...data });

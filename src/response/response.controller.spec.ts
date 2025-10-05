@@ -116,7 +116,7 @@ describe('ResponseController', () => {
     it('should return latest response marketplaceData', async () => {
       const mockResponse = {
         marketplaceData: { offersSubmitted: 5 },
-      } as any;
+      } as { marketplaceData: { offersSubmitted: number } };
 
       mockResponseService.getLatestResponse.mockResolvedValue(mockResponse);
 

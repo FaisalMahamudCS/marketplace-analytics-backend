@@ -81,10 +81,11 @@ export class MarketplaceResponseDAO implements IMarketplaceResponseDAO {
   }
 
   async getAverageResponseTime(): Promise<number> {
-    const result = await this.marketplaceResponseModel.aggregate([
-      { $group: { _id: null, avgTime: { $avg: '$responseTime' } } },
-    ]);
-    return result[0]?.avgTime || 0;
+    const result: Array<{ _id: unknown; avgTime?: number }> =
+      await this.marketplaceResponseModel.aggregate([
+        { $group: { _id: null, avgTime: { $avg: '$responseTime' } } },
+      ]);
+    return result[0]?.avgTime ?? 0;
   }
 }
 
@@ -127,16 +128,17 @@ export class GenericResponseDAO implements IGenericResponseDAO {
       statusCode: { $gte: 400 },
     });
 
-    const avgResponseTime = await this.responseModel.aggregate([
-      { $group: { _id: null, avgTime: { $avg: '$responseTime' } } },
-    ]);
+    const avgResponseTime: Array<{ _id: unknown; avgTime?: number }> =
+      await this.responseModel.aggregate([
+        { $group: { _id: null, avgTime: { $avg: '$responseTime' } } },
+      ]);
 
     return {
       total,
       successful,
       failed,
       successRate: total > 0 ? (successful / total) * 100 : 0,
-      averageResponseTime: avgResponseTime[0]?.avgTime || 0,
+      averageResponseTime: avgResponseTime[0]?.avgTime ?? 0,
     };
   }
 }
