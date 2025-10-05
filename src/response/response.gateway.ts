@@ -12,23 +12,28 @@ import { ResponseStats } from './dao/interfaces/response.dao.interface';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000','http://localhost:3002','https://marketplace-analytics-dashboard-fro.vercel.app']
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3002',
+      'https://marketplace-analytics-dashboard-fro.vercel.app',
+    ],
   },
 })
 export class ResponseGateway
-  implements OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
   private readonly logger = new Logger(ResponseGateway.name);
 
-  constructor(private readonly responseService: ResponseService) { }
+  constructor(private readonly responseService: ResponseService) {}
 
   handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
 
     // Send latest response data to newly connected client
-    this.sendLatestResponseToClient(client);
+    void this.sendLatestResponseToClient(client);
   }
 
   handleDisconnect(client: Socket) {
@@ -58,13 +63,12 @@ export class ResponseGateway
   /**
    * Broadcast new marketplace data to all connected clients
    */
-  async broadcastNewResponse(
-    responseData: Record<string, unknown>,
-  ): Promise<void> {
+  broadcastNewResponse(responseData: Record<string, unknown>): void {
     this.logger.log('Broadcasting new marketplace data to all clients');
 
     // Extract marketplace data from the response
-    const marketplaceData = (responseData as any).marketplaceData;
+    const marketplaceData = (responseData as { marketplaceData: unknown })
+      .marketplaceData;
 
     this.server.emit('newResponse', {
       success: true,
@@ -105,7 +109,8 @@ export class ResponseGateway
   @SubscribeMessage('getStats')
   async handleGetStats(client: Socket): Promise<void> {
     try {
-      const stats: ResponseStats = await this.responseService.getResponseStats();
+      const stats: ResponseStats =
+        await this.responseService.getResponseStats();
 
       client.emit('statsResponse', {
         success: true,

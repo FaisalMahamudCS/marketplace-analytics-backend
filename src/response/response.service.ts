@@ -1,10 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { MarketplaceData } from './schemas/response.schema';
 import { firstValueFrom } from 'rxjs';
 import { MarketplaceResponseDAO } from './dao/response.dao';
-import { ResponseStats } from './dao/interfaces/response.dao.interface';
+import {
+  ResponseStats,
+  MarketplaceData,
+} from './dao/interfaces/response.dao.interface';
 
 @Injectable()
 export class ResponseService {
@@ -14,7 +16,7 @@ export class ResponseService {
     private readonly marketplaceResponseDAO: MarketplaceResponseDAO,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   /**
    * Generate marketplace-specific payload
@@ -28,13 +30,6 @@ export class ResponseService {
       offersSubmitted: Math.floor(Math.random() * 30), // 0–29
       userViews: Math.floor(Math.random() * 500), // 0–499
     };
-  }
-
-  /**
-   * Generate marketplace payload
-   */
-  private generateRandomPayload(): Record<string, unknown> {
-    return this.generateMarketplacePayload();
   }
 
   /**
@@ -83,8 +78,10 @@ export class ResponseService {
         url: 'https://httpbin.org/anything',
         method: 'POST',
         marketplaceData: marketplaceData,
-        statusCode: (error as any).response?.status || 0,
-        responseData: (error as any).response?.data || null,
+        statusCode:
+          (error as { response?: { status?: number } }).response?.status || 0,
+        responseData:
+          (error as { response?: { data?: unknown } }).response?.data || null,
         responseTime,
         timestamp: new Date(),
         error: (error as Error).message,
@@ -97,14 +94,10 @@ export class ResponseService {
     }
   }
 
-
   /**
    * Get all historical marketplace response data
    */
-  async getAllResponses(
-    limit: number = 100,
-    offset: number = 0,
-  ) {
+  async getAllResponses(limit: number = 100, offset: number = 0) {
     return await this.marketplaceResponseDAO.findAll(limit, offset);
   }
 
