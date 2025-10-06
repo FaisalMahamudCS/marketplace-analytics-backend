@@ -346,7 +346,12 @@ npm cache clean --force
 rm -rf node_modules package-lock.json
 npm install
 ```
+Accessing Swagger UI
+http://localhost:3000/api-docs
+Explore endpoints
+Inspect request/response schemas
 
+Test API calls directly
 ##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
