@@ -13,7 +13,7 @@ import { HealthModule } from './health/health.module';
 
     MongooseModule.forRoot(
       process.env.MONGO_URI ||
-        'mongodb://localhost:27017/marketplace-analytics',
+      'mongodb://localhost:27017/marketplace-analytics',
     ),
 
     ScheduleModule.forRoot(),
@@ -22,4 +22,4 @@ import { HealthModule } from './health/health.module';
     HealthModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
