@@ -1,6 +1,6 @@
-# HTTP Response Monitor
-
-A full-stack application that monitors HTTP responses from httpbin.org/anything endpoint and displays them in real-time. This application demonstrates modern web development practices with NestJS backend, React frontend, MongoDB database, WebSocket real-time communication, and comprehensive testing.
+# Marketplace Analytics Dashboard Backend
+A **real-time marketplace analytics dashboard** built using **NestJS**, **Next.js 15**, **MongoDB**, and **WebSocket**.
+Monitor marketplace API data live, visualize key metrics, and explore historical trends — all in a responsive, beautiful UI.
 
 ##  Features
 
@@ -16,8 +16,7 @@ A full-stack application that monitors HTTP responses from httpbin.org/anything 
 ### Frontend Features
 - **Real-time Dashboard**: Live updates via WebSocket connection
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Statistics Overview**: Success rates, response times, and request counts
-- **Data Table**: Sortable and filterable response history
+- **Data Table**: Realtime response history
 - **Connection Status**: Visual indicator of WebSocket connection state
 - **Modern UI**: Beautiful gradient design with glassmorphism effects
 
