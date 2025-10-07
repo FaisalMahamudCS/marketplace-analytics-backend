@@ -31,8 +31,6 @@ export class ResponseGateway
 
   handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
-
-    // Send latest response data to newly connected client
     void this.sendLatestResponseToClient(client);
   }
 

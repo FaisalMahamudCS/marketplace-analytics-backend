@@ -4,13 +4,13 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HttpModule } from '@nestjs/axios';
 import { ResponseModule } from './response/response.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
     // Load .env variables
     ConfigModule.forRoot({ isGlobal: true }),
 
-    // Use env variable for MongoDB connection
     MongooseModule.forRoot(
       process.env.MONGO_URI ||
         'mongodb://localhost:27017/marketplace-analytics',
@@ -19,6 +19,7 @@ import { ResponseModule } from './response/response.module';
     ScheduleModule.forRoot(),
     HttpModule,
     ResponseModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
