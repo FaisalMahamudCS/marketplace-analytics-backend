@@ -6,7 +6,7 @@ import {
   MarketplaceResponseDocument,
   Response,
   ResponseDocument,
-} from '../../schemas/response.schema';
+} from '../schemas/response.schema';
 import {
   IMarketplaceResponseDAO,
   IGenericResponseDAO,
@@ -122,11 +122,13 @@ export class GenericResponseDAO implements IGenericResponseDAO {
     return docs as unknown as ResponseDocument[];
   }
 
-  async findLatest(): Promise<ResponseDocument | null> {
+  async findLatest(): Promise<ResponseDocument[] | null> {
     const doc = await this.responseModel
-      .findOne()
+      .find()
       .sort({ timestamp: -1 })
+      .limit(1)
       .exec();
+    return doc.length > 0 ? (doc as ResponseDocument[]) : null;
     return doc as unknown as ResponseDocument | null;
   }
 

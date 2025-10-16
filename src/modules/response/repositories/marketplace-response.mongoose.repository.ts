@@ -16,7 +16,7 @@ export class MarketplaceResponseMongooseRepository
   async create(
     responseData: Record<string, unknown>,
   ): Promise<MarketplaceResponseDocument> {
-    return (await this.dao.create(responseData)) as MarketplaceResponseDocument;
+    return await this.dao.create(responseData);
   }
 
   async findAll(

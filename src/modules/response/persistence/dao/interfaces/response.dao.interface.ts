@@ -38,6 +38,6 @@ export interface IMarketplaceResponseDAO {
 export interface IGenericResponseDAO {
   create(responseData: Record<string, unknown>): Promise<ResponseDocument>;
   findAll(limit: number, offset: number): Promise<ResponseDocument[]>;
-  findLatest(): Promise<ResponseDocumentWith | null>;
+  findLatest(): Promise<ResponseDocument[] | null>;
   getStats(): Promise<ResponseStats>;
 }
