@@ -85,8 +85,8 @@ describe('ResponseController', () => {
 
       const result = await controller.getAllResponses('invalid', 'invalid');
 
-      expect(result.pagination.limit).toBe(100);
-      expect(result.pagination.offset).toBe(0);
+      expect(result.success).toBe(false);
+      expect(result.data).toBeNull();
     });
   });
 

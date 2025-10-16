@@ -5,11 +5,17 @@ import { ResponseController } from './controllers/response.controller';
 import { ResponseGateway } from './gateways/response.gateway';
 import { SchedulerService } from './services/scheduler.service';
 import { RepositoryModule } from './repositories/repository.module';
+import { ApiResponseService } from './services/api-response.service';
 
 @Module({
   imports: [RepositoryModule, HttpModule],
   controllers: [ResponseController],
-  providers: [ResponseService, ResponseGateway, SchedulerService],
-  exports: [ResponseService, ResponseGateway],
+  providers: [
+    ResponseService,
+    ResponseGateway,
+    SchedulerService,
+    ApiResponseService,
+  ],
+  exports: [ResponseService, ResponseGateway, ApiResponseService],
 })
 export class ResponseModule {}

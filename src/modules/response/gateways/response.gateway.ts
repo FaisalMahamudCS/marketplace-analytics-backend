@@ -47,7 +47,7 @@ export class ResponseGateway
       if (latestResponse) {
         client.emit('latestResponse', {
           success: true,
-            data: latestResponse.marketplaceData,
+          data: latestResponse.marketplaceData,
         });
       }
     } catch (error) {
