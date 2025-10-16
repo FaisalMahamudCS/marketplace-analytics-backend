@@ -3,8 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HttpModule } from '@nestjs/axios';
-import { ResponseModule } from './response/response.module';
-import { HealthModule } from './health/health.module';
+import { ResponseModule } from './modules/response/response.module';
+import { HealthModule } from './modules/health/health.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -15,7 +15,7 @@ import { AppService } from './app.service';
 
     MongooseModule.forRoot(
       process.env.MONGO_URI ||
-      'mongodb://localhost:27017/marketplace-analytics',
+        'mongodb://localhost:27017/marketplace-analytics',
     ),
 
     ScheduleModule.forRoot(),
@@ -23,8 +23,8 @@ import { AppService } from './app.service';
     ResponseModule,
     HealthModule,
   ],
-    controllers: [AppController],
-    providers: [AppService],
-    // exports: [ResponseService, ResponseGateway],
+  controllers: [AppController],
+  providers: [AppService],
+  // exports: [ResponseService, ResponseGateway],
 })
-export class AppModule { }
+export class AppModule {}

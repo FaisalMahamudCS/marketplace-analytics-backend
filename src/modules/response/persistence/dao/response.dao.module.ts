@@ -5,14 +5,17 @@ import {
   ResponseSchema,
   MarketplaceResponse,
   MarketplaceResponseSchema,
-} from '../schemas/response.schema';
+} from '../../schemas/response.schema';
 import { MarketplaceResponseDAO, GenericResponseDAO } from './response.dao';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Response.name, schema: ResponseSchema },
-      { name: MarketplaceResponse.name, schema: MarketplaceResponseSchema },
+      { name: Response.name as string, schema: ResponseSchema },
+      {
+        name: MarketplaceResponse.name as string,
+        schema: MarketplaceResponseSchema,
+      },
     ]),
   ],
   providers: [MarketplaceResponseDAO, GenericResponseDAO],

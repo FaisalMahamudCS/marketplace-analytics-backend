@@ -4,7 +4,7 @@ eslint-disable @typescript-eslint/no-unsafe-assignment,
 */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseGateway } from './response.gateway';
-import { ResponseService } from './response.service';
+import { ResponseService } from '../services/response.service';
 import { Server, Socket } from 'socket.io';
 
 describe('ResponseGateway', () => {
@@ -36,7 +36,7 @@ describe('ResponseGateway', () => {
     mockService.getLatestResponse.mockResolvedValue({
       marketplaceData: { activeDeals: 100 },
     });
-    await gateway.handleConnection(mockSocket);
+    await gateway.handleConnection(mockSocket as Socket);
     expect(mockSocket.emit).toHaveBeenCalledWith('latestResponse', {
       success: true,
       data: { activeDeals: 100 },
@@ -62,7 +62,7 @@ describe('ResponseGateway', () => {
       successRate: 100,
       averageResponseTime: 10,
     });
-    await gateway.handleGetStats(mockSocket);
+    await gateway.handleGetStats(mockSocket as Socket);
     expect(mockSocket.emit).toHaveBeenCalledWith('statsResponse', {
       success: true,
       data: expect.objectContaining({ total: 1 }),

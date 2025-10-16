@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ResponseService } from './response.service';
-import { ResponseGateway } from './response.gateway';
+import { ResponseGateway } from '../gateways/response.gateway';
 
 @Injectable()
 export class SchedulerService {

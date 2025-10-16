@@ -6,7 +6,7 @@ import {
   MarketplaceResponseDocument,
   Response,
   ResponseDocument,
-} from '../schemas/response.schema';
+} from '../../schemas/response.schema';
 import {
   IMarketplaceResponseDAO,
   IGenericResponseDAO,
@@ -24,27 +24,31 @@ export class MarketplaceResponseDAO implements IMarketplaceResponseDAO {
   async create(
     responseData: Record<string, unknown>,
   ): Promise<MarketplaceResponseDocument> {
-    // Use model.create for simpler construction/mocking
-    return await this.marketplaceResponseModel.create(responseData as any);
+    const doc = await this.marketplaceResponseModel.create(
+      responseData as Partial<MarketplaceResponse>,
+    );
+    return doc as unknown as MarketplaceResponseDocument;
   }
 
   async findAll(
     limit: number = 100,
     offset: number = 0,
   ): Promise<MarketplaceResponseWithData[]> {
-    return await this.marketplaceResponseModel
+    const docs = await this.marketplaceResponseModel
       .find()
       .sort({ timestamp: -1 })
       .limit(limit)
       .skip(offset)
       .exec();
+    return docs as unknown as MarketplaceResponseWithData[];
   }
 
   async findLatest(): Promise<MarketplaceResponseWithData | null> {
-    return await this.marketplaceResponseModel
+    const doc = await this.marketplaceResponseModel
       .findOne()
       .sort({ timestamp: -1 })
       .exec();
+    return doc as unknown as MarketplaceResponseWithData | null;
   }
 
   async getStats(): Promise<ResponseStats> {
@@ -99,24 +103,31 @@ export class GenericResponseDAO implements IGenericResponseDAO {
   async create(
     responseData: Record<string, unknown>,
   ): Promise<ResponseDocument> {
-    const response = new this.responseModel(responseData);
-    return await response.save();
+    const doc = await this.responseModel.create(
+      responseData as Partial<Response>,
+    );
+    return doc as unknown as ResponseDocument;
   }
 
   async findAll(
     limit: number = 100,
     offset: number = 0,
   ): Promise<ResponseDocument[]> {
-    return await this.responseModel
+    const docs = await this.responseModel
       .find()
       .sort({ timestamp: -1 })
       .limit(limit)
       .skip(offset)
       .exec();
+    return docs as unknown as ResponseDocument[];
   }
 
   async findLatest(): Promise<ResponseDocument | null> {
-    return await this.responseModel.findOne().sort({ timestamp: -1 }).exec();
+    const doc = await this.responseModel
+      .findOne()
+      .sort({ timestamp: -1 })
+      .exec();
+    return doc as unknown as ResponseDocument | null;
   }
 
   async getStats(): Promise<ResponseStats> {

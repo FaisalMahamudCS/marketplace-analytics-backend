@@ -39,7 +39,6 @@ describe('MarketplaceResponseDAO', () => {
     }).compile();
 
     dao = module.get<MarketplaceResponseDAO>(MarketplaceResponseDAO);
-    // make sure the dao uses our mock reference
     (
       dao as unknown as { marketplaceResponseModel: typeof injectedModelMock }
     ).marketplaceResponseModel = injectedModelMock;

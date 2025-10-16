@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SchedulerService } from './scheduler.service';
 import { ResponseService } from './response.service';
-import { ResponseGateway } from './response.gateway';
+import { ResponseGateway } from '../gateways/response.gateway';
 
 describe('SchedulerService', () => {
   let service: SchedulerService;
@@ -28,7 +28,7 @@ describe('SchedulerService', () => {
   });
 
   it('should ping and broadcast when latest exists', async () => {
-    mockResponseService.pingHttpBin.mockResolvedValue({_id:'1'});
+    mockResponseService.pingHttpBin.mockResolvedValue({ _id: '1' });
     mockResponseService.getLatestResponse.mockResolvedValue({ _id: '1' });
     await service.handlePingHttpBin();
     expect(mockResponseService.pingHttpBin).toHaveBeenCalled();

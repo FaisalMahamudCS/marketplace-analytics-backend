@@ -1,6 +1,9 @@
 import { Controller, Get, Query, Logger } from '@nestjs/common';
-import { ResponseService } from './response.service';
-import { ResponseStats } from './dao/interfaces/response.dao.interface';
+import { ResponseService } from '../services/response.service';
+import {
+  MarketplaceResponseWithData,
+  ResponseStats,
+} from '../persistence/dao/interfaces/response.dao.interface';
 
 @Controller('responses')
 export class ResponseController {
@@ -24,10 +27,8 @@ export class ResponseController {
       `Fetching responses - Limit: ${limitNum}, Offset: ${offsetNum}`,
     );
 
-    const responses = await this.responseService.getAllResponses(
-      limitNum,
-      offsetNum,
-    );
+    const responses: MarketplaceResponseWithData[] =
+      await this.responseService.getAllResponses(limitNum, offsetNum);
 
     return {
       success: true,

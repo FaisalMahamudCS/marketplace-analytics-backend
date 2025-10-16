@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseController } from './response.controller';
-import { ResponseService } from './response.service';
-import { MarketplaceResponseWithData } from './dao/interfaces/response.dao.interface';
+import { ResponseService } from '../services/response.service';
+import type { MarketplaceResponseWithData } from '../persistence/dao/interfaces/response.dao.interface';
 
 describe('ResponseController', () => {
   let controller: ResponseController;
