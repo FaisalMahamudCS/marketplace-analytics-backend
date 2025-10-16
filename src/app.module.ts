@@ -5,6 +5,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { HttpModule } from '@nestjs/axios';
 import { ResponseModule } from './response/response.module';
 import { HealthModule } from './health/health.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -21,5 +23,8 @@ import { HealthModule } from './health/health.module';
     ResponseModule,
     HealthModule,
   ],
+    controllers: [AppController],
+    providers: [AppService],
+    // exports: [ResponseService, ResponseGateway],
 })
 export class AppModule { }

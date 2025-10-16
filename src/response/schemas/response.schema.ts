@@ -22,6 +22,8 @@ export class MarketplaceData {
 
   @Prop({ required: true, min: 0, max: 499 })
   userViews: number;
+  @Prop({ required: true, enum: ['Electronics', 'Agriculture', 'Manufacturing', 'Entertainment', 'Education', 'Technology']})
+  category: string;
 
   // Index signature to satisfy Record<string, unknown>
   [key: string]: unknown;

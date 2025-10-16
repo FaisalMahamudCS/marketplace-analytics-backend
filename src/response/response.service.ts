@@ -16,12 +16,14 @@ export class ResponseService {
     private readonly marketplaceResponseDAO: MarketplaceResponseDAO,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   /**
    * Generate marketplace-specific payload
    */
   private generateMarketplacePayload(): MarketplaceData {
+    const categories = ['Electronics', 'Agriculture', 'Manufacturing', 'Entertainment', 'Education','Technology']; 
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
     return {
       timestamp: Date.now(),
       activeDeals: Math.floor(Math.random() * 200) + 50, // 50–250
@@ -29,6 +31,8 @@ export class ResponseService {
       averageDealValueUSD: Math.floor(Math.random() * 50000) + 5000, // $5k–$55k
       offersSubmitted: Math.floor(Math.random() * 30), // 0–29
       userViews: Math.floor(Math.random() * 500), // 0–499
+      category: randomCategory,
+
     };
   }
 
@@ -73,7 +77,7 @@ export class ResponseService {
       );
     } catch (error) {
       const responseTime = Date.now() - startTime;
-
+       
       const errorData = {
         url: 'https://httpbin.org/anything',
         method: 'POST',

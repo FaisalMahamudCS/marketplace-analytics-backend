@@ -28,7 +28,7 @@ describe('SchedulerService', () => {
   });
 
   it('should ping and broadcast when latest exists', async () => {
-    mockResponseService.pingHttpBin.mockResolvedValue();
+    mockResponseService.pingHttpBin.mockResolvedValue({_id:'1'});
     mockResponseService.getLatestResponse.mockResolvedValue({ _id: '1' });
     await service.handlePingHttpBin();
     expect(mockResponseService.pingHttpBin).toHaveBeenCalled();
