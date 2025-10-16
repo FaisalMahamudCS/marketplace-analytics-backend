@@ -43,6 +43,11 @@ export class MarketplaceResponseDAO implements IMarketplaceResponseDAO {
     return docs as unknown as MarketplaceResponseWithData[];
   }
 
+  async findById(id: string): Promise<MarketplaceResponse> {
+    const doc = await this.marketplaceResponseModel.findById(id);
+    return doc as unknown as MarketplaceResponse;
+  }
+
   async findLatest(): Promise<MarketplaceResponseWithData | null> {
     const doc = await this.marketplaceResponseModel
       .findOne()
@@ -129,7 +134,10 @@ export class GenericResponseDAO implements IGenericResponseDAO {
       .limit(1)
       .exec();
     return doc.length > 0 ? (doc as ResponseDocument[]) : null;
-    return doc as unknown as ResponseDocument | null;
+  }
+  async findOne(id: string): Promise<ResponseDocument[]> {
+    const docs = await this.responseModel.findById(id);
+    return docs as unknown as ResponseDocument[];
   }
 
   async getStats(): Promise<ResponseStats> {

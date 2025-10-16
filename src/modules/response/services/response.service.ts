@@ -19,7 +19,7 @@ export class ResponseService {
     private readonly marketplaceRepository: MarketplaceResponseRepository,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   /**
    * Generate marketplace-specific payload
@@ -121,7 +121,14 @@ export class ResponseService {
   ): Promise<MarketplaceResponseWithData[]> {
     return await this.marketplaceRepository.findAll(limit, offset);
   }
-
+  /**
+   * Get marketplace response by id
+   */
+  async getResponseById(
+    id: string,
+  ): Promise<MarketplaceResponseWithData | null> {
+    return await this.marketplaceRepository.findById(id);
+  }
   /**
    * Get marketplace response statistics
    */

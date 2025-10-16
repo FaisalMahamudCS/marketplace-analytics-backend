@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Logger } from '@nestjs/common';
+import { Controller, Get, Query, Logger, Param } from '@nestjs/common';
 import { ResponseService } from '../services/response.service';
 import {
   MarketplaceResponseWithData,
@@ -40,6 +40,15 @@ export class ResponseController {
       },
     };
   }
+  @Get('/:id')
+  async getResponseById(@Param('id') id: string) {
+    const response=await this.responseService.getResponseById(id);
+    return {
+      success: true,
+      data: response?.marketplaceData,
+    };
+  }
+
 
   /**
    * Get response statistics
@@ -52,11 +61,11 @@ export class ResponseController {
   }> {
     this.logger.log('Fetching response statistics');
 
-    const stats: ResponseStats = await this.responseService.getResponseStats();
+    const status: ResponseStats = await this.responseService.getResponseStats();
 
     return {
       success: true,
-      data: stats,
+      data: status,
     };
   }
 

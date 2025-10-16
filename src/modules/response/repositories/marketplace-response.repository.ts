@@ -12,6 +12,7 @@ export abstract class MarketplaceResponseRepository {
     limit: number,
     offset: number,
   ): Promise<MarketplaceResponseWithData[]>;
+  abstract findById(id: string): Promise<MarketplaceResponseWithData | null>;
   abstract findLatest(): Promise<MarketplaceResponseWithData | null>;
   abstract getStats(): Promise<ResponseStats>;
 }
