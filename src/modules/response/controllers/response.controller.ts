@@ -13,7 +13,7 @@ export class ResponseController {
   constructor(
     private readonly responseService: ResponseService,
     private readonly apiResponse: ApiResponseService,
-  ) {}
+  ) { }
 
   /**
    * Get all historical response data
