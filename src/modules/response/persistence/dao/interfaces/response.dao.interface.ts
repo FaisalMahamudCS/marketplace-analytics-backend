@@ -18,6 +18,15 @@ export interface MarketplaceResponseWithData
   extends MarketplaceResponseDocument {
   marketplaceData: MarketplaceData;
 }
+export interface FailedRequests {
+  _id: string;
+  url: string;
+  method: string;
+  statusCode: number;
+  timestamp: Date;
+  responseTime: number;
+  errorMessage: string;
+}
 
 export interface IMarketplaceResponseDAO {
   create(

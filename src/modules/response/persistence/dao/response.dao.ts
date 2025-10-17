@@ -12,6 +12,7 @@ import {
   IGenericResponseDAO,
   ResponseStats,
   MarketplaceResponseWithData,
+  FailedRequests,
 } from './interfaces/response.dao.interface';
 
 @Injectable()
@@ -75,6 +76,20 @@ export class MarketplaceResponseDAO implements IMarketplaceResponseDAO {
 
   async countDocuments(): Promise<number> {
     return await this.marketplaceResponseModel.countDocuments();
+  }
+  async failedRequests(): Promise<FailedRequests> {
+    const result = await this.marketplaceResponseModel
+      .find({ statusCode: { $gte: 400 } })
+      .select({
+        _id: 1,
+        url: 1,
+        method: 1,
+        statusCode: 1,
+        timestamp: 1,
+        responseTime: 1,
+        errorMessage: 1,
+      });
+    return result as unknown as FailedRequests;
   }
 
   async countSuccessful(): Promise<number> {

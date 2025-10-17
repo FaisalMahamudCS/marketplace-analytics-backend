@@ -1,3 +1,4 @@
+import { FailedRequests } from './../persistence/dao/interfaces/response.dao.interface';
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -120,6 +121,12 @@ export class ResponseService {
     offset: number = 0,
   ): Promise<MarketplaceResponseWithData[]> {
     return await this.marketplaceRepository.findAll(limit, offset);
+  }
+  /**
+   * GET Failed Response API
+   */
+  async FailedRequests(): Promise<FailedRequests> {
+    return await this.marketplaceRepository.FailedRequests();
   }
   /**
    * Get marketplace response by id

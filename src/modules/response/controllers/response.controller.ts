@@ -13,7 +13,7 @@ export class ResponseController {
   constructor(
     private readonly responseService: ResponseService,
     private readonly apiResponse: ApiResponseService,
-  ) { }
+  ) {}
 
   /**
    * Get all historical response data
@@ -45,6 +45,21 @@ export class ResponseController {
       },
     );
   }
+  /**   * GET Failed Requests
+   * GET /responses/failed
+   */
+  @Get('/failed')
+  async FailedRequests() {
+    try {
+      const response = await this.responseService.FailedRequests();
+      return this.apiResponse.ok(response);
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch failed requests: ${(error as Error).message}`,
+      );
+    }
+  }
+
   @Get('/:id')
   async getResponseById(@Param('id') id: string) {
     const response = await this.responseService.getResponseById(id);

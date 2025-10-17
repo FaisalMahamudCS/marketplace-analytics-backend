@@ -2,9 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseController } from './response.controller';
 import { ResponseService } from '../services/response.service';
 import type { MarketplaceResponseWithData } from '../persistence/dao/interfaces/response.dao.interface';
+import { ApiResponseService } from '../services/api-response.service';
 
 describe('ResponseController', () => {
   let controller: ResponseController;
+  const mockApiResponseService = {
+    getResponses: jest.fn().mockResolvedValue({
+      data: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+    })
+  }
 
   const mockResponseService = {
     getAllResponses: jest.fn(),
@@ -16,10 +25,9 @@ describe('ResponseController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ResponseController],
       providers: [
-        {
-          provide: ResponseService,
-          useValue: mockResponseService,
-        },
+        { provide: ResponseService, useValue: mockResponseService },
+
+        { provide: ApiResponseService, useValue: mockApiResponseService },
       ],
     }).compile();
 

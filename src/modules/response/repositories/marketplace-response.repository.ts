@@ -1,3 +1,4 @@
+import { FailedRequests } from './../persistence/dao/interfaces/response.dao.interface';
 import { MarketplaceResponseDocument } from '../persistence/schemas/response.schema';
 import {
   ResponseStats,
@@ -12,6 +13,7 @@ export abstract class MarketplaceResponseRepository {
     limit: number,
     offset: number,
   ): Promise<MarketplaceResponseWithData[]>;
+  abstract FailedRequests(): Promise<FailedRequests>;
   abstract findById(id: string): Promise<MarketplaceResponseWithData | null>;
   abstract findLatest(): Promise<MarketplaceResponseWithData | null>;
   abstract getStats(): Promise<ResponseStats>;

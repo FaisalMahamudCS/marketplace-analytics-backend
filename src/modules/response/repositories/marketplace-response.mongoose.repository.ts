@@ -1,3 +1,4 @@
+import { FailedRequests } from './../persistence/dao/interfaces/response.dao.interface';
 import { Injectable } from '@nestjs/common';
 import { MarketplaceResponseRepository } from './marketplace-response.repository';
 import { MarketplaceResponseDAO } from '../persistence/dao/response.dao';
@@ -31,14 +32,14 @@ export class MarketplaceResponseMongooseRepository
   }
   async findById(id: string): Promise<MarketplaceResponseWithData | null> {
     const result = await this.dao.findById(id);
-    // Fix: make sure the result matches the MarketplaceResponseWithData type (result could be a plain MarketplaceResponse or undefined)
     if (!result) {
       return null;
     }
-    // If further transformation is needed to fit the type, do it here.
     return result as MarketplaceResponseWithData;
   }
-
+  async FailedRequests(): Promise<FailedRequests> {
+    return await this.dao.failedRequests();
+  }
   async getStats(): Promise<ResponseStats> {
     return await this.dao.getStats();
   }
